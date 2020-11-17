@@ -1,0 +1,26 @@
+Tokenizzandoli in questa maniera, penso che i paths vengano almeno di lunghezza
+decente. Ho pensato che, se il formato in cui li converto è quello giusto (X_IST_OPERAND/etc..)
+posso convertire in questa maniera facilmente i paths che già ho in 'preprocess_paths.py', 
+a patto che io abbia una lista delle istruzioni in x86.
+
+Il dubbio che avevamo qui, se non sbaglio, riguardava le stringhe e i nomi delle funzioni da libc
+che ho nel dataset per la vocab_size finale.
+
+Per quanto riguarda i nomi delle funzioni da libc, sono un numero limitato (dal file che mi aveva
+passato Giuseppe). Più di quel tot di funzioni non dovrei avere nel vocab finale del tokenizer.
+
+Per quanto riguarda le stringhe, potrei avere una cosa del genere:
+
+X_ISTR_OP_a_surprise_to_be_sure_but_a_welcome_one
+X_ISTR_OP_hello_there
+X_ISTR_OP_general_Kenobi
+X_ISTR_OP_hello_there
+X_ISTR_OP_general_Kenobi
+X_ISTR_OP_a_very_long_string_about_star_wars_because_yes
+
+stavo pensando che io posso settare una min_frequency nel tokenizer. Ad esempio se io in questo caso
+la setto =2, le quattro istruzioni corte nel mezzo vengono messe nel vocabolario (quindi ho un +2), ma non la prima e l'ultima.
+Mi aspetto che le istruzioni con stringhe più lunghe difficilmente possano ripetersi più di un tot, e in generale
+mi aspetto che ci siano soltanto un numero limitato di tali istruzioni con stringa che effettivamente si ripeta più
+di un tot nel dataset. Quindi non verrebbero prese nel caso, giusto? E' un'assunzione un po' troppo lontana
+dalla realtà?

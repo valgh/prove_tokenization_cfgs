@@ -1,0 +1,19 @@
+Per un commento su come ho pensato di svolgere la tokenizzazione, 
+vedere 'commento.txt'.
+
+
+=======ESECUZIONE=========
+
+1. 'readlines.py' legge i paths da 'load_file.json' e crea il file 'tok_train.txt'
+su cui poi viene allenato il tokenizer di BERT.
+
+2. 'train_tok.py' traina il tokenizer sul file del punto 1.
+
+3. 'tok_seq.py' carica il tokenizer precedentemente allenato e tokenizza
+i paths nel file 'load_file.json' dando in output 'tokenized_load_file.json'.
+
+3. 'adv_cfgs.py' è il file che implementa la logica del recupero della rappresentazione
+dei paths finale (vedi 'commento.txt'). Prende in input il file dei paths
+già tokenizzati senza restrizioni di lunghezza e ne restituisce un massimo di 20
+diversi paths (o parti di essi) di una lunghezza massima prefissata (paddati o troncati)
+in 'adv_tokenized_load_file.json'.

@@ -1,0 +1,22 @@
+La classe del tokenizer è nel file 'asmtokenizer.py'.
+L'ho scritta rapidamente, probabilmente non è così memory efficient,
+quindi è da provare con valori bassi.
+Il file 'load_file.json' è il file su cui ho testato,
+un file contenente 12 diversi path per la funzione load_file.
+
+=====ESECUZIONE=====
+
+1. 'preprocess_paths.py' è il file che prende in input 'load_file.json'
+e restituisce 'pre_load_file.json', prendendo ogni singolo path in esso
+e trasformandone il formato delle istruzioni da 'MOV RAX RBX' in
+'X_MOV_RAX_RBX'.
+
+2. 'readlines.py' legge i paths in 'pre_load_file.json' e
+crea il file 'input.txt' che sarà quello su cui andrà a trainare il tokenizer.
+
+3. 'train.py' traina il tokenizer e crea il file 'vocab_asm.txt', il vocabolario
+del tokenizer da caricare poi nuovamente sullo stesso quando si vorrà utilizzare.
+
+4. 'tok_seqs'tokenizza i paths contenuti nel file 'pre_load_file.json' con il
+tokenizer allenato nel punto precedente. I risultati in termini di lunghezza sono 
+in results.txt.

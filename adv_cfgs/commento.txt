@@ -1,0 +1,77 @@
+Date alcune delle idee dell'ultimo meet su come poter riorganizzare i paths
+avendo una lunghezza massima, ho pensato di metterle insieme e definire una strategia,
+che potrebbe anche essere completamente sbagliata o ritoccabile.
+
+La strategia è la seguente:
+
+1. prendere direttamente i paths tokenizzati (vedi fine) delle funzioni, essendo questi
+tokenizzati senza limiti di lunghezza (no padding/troncamento), sempre massimo 20 per funzione.
+
+2. scorrere ogni path all'interno della funzione bersaglio. Adesso,
+voglio che ogni path nella mia funzione risulti di lunghezza massima 
+MAX_LENGTH. A questo punto posso avere tre diversi casi: X, Y, Z.
+
+===CASO_X===
+
+la lunghezza del path è < MAX_LENGTH. Copio direttamente il path nell'output
+senza toccarlo.
+
+===CASO_Y===
+
+la lunghezza del path è < 2*(MAX_LENGTH)-2.** Questo vuol dire che posso splittare
+il path a metà in due diversi paths, e copiarli nell'output SE NON SONO
+GIA' PRESENTI NELLO STESSO: così riesco a rappresentare l'intero path, 
+anche se in due pezzi diversi.
+Prima di copiarli nell'output, aggiungo [CLS], [SEP] e controllo se ci sia bisogno
+di paddare i paths.
+
+**Il '-2' è dovuto al fatto che per BERT devo considerare anche i token [CLS] e [SEP] da aggiungere 
+ai due paths splittati.
+
+
+===CASO_Y===
+
+lunghezza del path > (2*MAX_LENGTH)-2.
+In questo caso, ragiono così:
+
+-> prendo i primi MAX_LENGTH-1** tokens nel path, e questo diventa un primo path.
+-> prendo gli ultimi MAX_LENGTH-1** tokens nel path, e questo diventa un secondo path.
+
+---> adesso prendo ciò che resta dei tokens (la parte 'in mezzo') e la splitto ancora 
+in n parti possibilmente uguali contenenti ciascuna MAX_LENGTH-2** tokens. 
+Nota: in questo processo alcune di queste parti potrebbero non venire esattamente lunghe MAX_LENGTH-2,
+dipende chiaramente da quanti token restano. ***
+
+Ora scorro tutti questi paths che ho ricavato di lunghezza massima MAX_LENGTH.
+Li paddo, aggiungo i tokens [CLS], [SEP] dove mancano. Scorro la mia lista di paths in output,
+se uno di questi paths non è presente, lo aggiungo alla lsita finale se questa
+non supera il massimo di 20 paths contenuti.
+
+** sempre dovuto al fatto che devo aggiungere [CLS], [SEP].
+
+*** mi è appena venuto in mente che di questi paths 'nel mezzo', una buona strategia sarebbe quella di
+verificarne, ancora prima di paddarli, la lunghezza effettiva. Questo perché questi paths, potrebbero anche
+venire molto corti in alcuni casi (solo un token o una manciata di essi). In questo caso, li scarterei
+direttamente perché è probabile che essi vengano già ricavati in qualche altro path precedente o successivo,
+e comunque path contenenti 3 token (es.: [CLS], 45, 65, 77, PAD, PAD, ..., PAD, [SEP]) aggiungono poco
+alla rappresentazione.
+
+
+
+==========Perchè prendere i paths già tokenizzati?==========
+
+Ci ho pensato un po', per un paio di motivi diversi:
+
+1. se agisco direttamente sulle stringhe avendo una lunghezza massima però che si riferisce ai paths tokenizzati,
+queste due lunghezze non sono comparabili. La lunghezza 100 sul path tokenizzato è diversa dalla lunghezza 100 sulla stringa non tokenizzata.
+Non potendo sapere esattamente come il mio tokenizer tokenizza ogni singola stringa nel dataset, agendo direttamente
+sulle stringhe per ottenere 20 paths tutti della stessa lunghezza o comuqnue inferiore ad essa, potrei comunque incappare quando vado a tokenizzare
+in sequenze che sono comunque più lunghe della mia MAX_LENGTH, oppure eccessivamente corte.
+
+2. se agisco direttamente sulle stringhe, è probabile che io riesca ad ottenere delle rappresentazioni più fedeli alla funzione,
+magari splittando sull'indice della stringa dove i paths ricavati sono diversi ed ottenendo le varie ramificazioni.
+Questo però mi è sembrato un processo un po' folle da fare, specialmente nel caso in cui ho 20 paths tutti molto lunghi: dovrei confrontarli tutti quanti
+a coppie e il risultato potrebbe essere anche un centinaio o più di diverse stringhe/pezzi del cfg, e non è detto che questi poi
+una volta tokenizzati stiano nel limite della MAX_LENGTH. Dovesse essere l'unica soluzione percorribile però, questo si potrebbe anche fare.
+
+ 

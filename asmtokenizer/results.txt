@@ -1,0 +1,17 @@
+Prima colonna (sinistra): lunghezze dei paths tokenizzati con ASMTokenizer sul file 'pre_load_file.json'.
+Seconda colonna (destra): lunghezze dei paths tokenizzati con BERTTokenizer
+sul file originale 'load_file.json'.
+
+
+38 - 134
+31 - 122
+78 - 254
+43 - 142
+59 - 196
+120 - 378
+101 - 320
+36 - 130
+52 - 184
+57 - 192
+80 - 258
+73 - 246
