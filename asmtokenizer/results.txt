@@ -1,4 +1,7 @@
-Prima colonna (sinistra): lunghezze dei paths tokenizzati con ASMTokenizer sul file 'pre_load_file.json'.
+Prima colonna (sinistra): lunghezze dei paths tokenizzati con ASMTokenizer sul file 'pre_load_file.json'. A tutti
+i numeri della colonna di sinistra c'è da aggiunger un '+2' per i tokens di [CLS] e [SEP] che al momento
+non sono aggiunti dal tokenizer.
+
 Seconda colonna (destra): lunghezze dei paths tokenizzati con BERTTokenizer
 sul file originale 'load_file.json'.
 
