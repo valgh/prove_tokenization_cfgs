@@ -3,7 +3,6 @@
 #####################
 
 import os
-import tqdm 
 
 
 class ASMTokenizer:
