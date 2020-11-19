@@ -1,13 +1,4 @@
-<<<<<<< HEAD
 Lunghezze dei paths tokenizzati con 'asmtokenizer' - con registry normalization:
-=======
-Prima colonna (sinistra): lunghezze dei paths tokenizzati con ASMTokenizer sul file 'pre_load_file.json'. A tutti
-i numeri della colonna di sinistra c'è da aggiunger un '+2' per i tokens di [CLS] e [SEP] che al momento
-non sono aggiunti dal tokenizer.
-
-Seconda colonna (destra): lunghezze dei paths tokenizzati con BERTTokenizer
-sul file originale 'load_file.json'.
->>>>>>> b83e51f3baf45c302c9cf6d7d2c680186300f713
 
 1a ===> senza registry normalization, senza splittare le stringhe (sbagliato)
 2a ===> con registry normalization, splittando le stringhe (qui solo nomi di funzioni, poco indicativo)
@@ -29,17 +20,3 @@ sul file originale 'load_file.json'.
 57 - 67 - 192
 80 - 89 - 258
 73 - 85 - 246
-=======
-38 - 134
-31 - 122
-78 - 254
-43 - 142
-59 - 196
-120 - 378
-101 - 320
-36 - 130
-52 - 184
-57 - 192
-80 - 258
-73 - 246
->>>>>>> b83e51f3baf45c302c9cf6d7d2c680186300f713
