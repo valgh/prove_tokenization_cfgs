@@ -14,7 +14,7 @@ def main():
 		seqs = json.load(f)
 	out = []
 	for seq in seqs:
-		out.append(asm_tokenizer.encode(seq))
+		out.append(asm_tokenizer.encode(seq, padding=False, truncate=False))
 	print(out)
 	for s in out:
 		print(len(s))

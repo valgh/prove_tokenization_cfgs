@@ -1,45 +1,78 @@
 import json
 import os
+import re
 
+def filter_registers(asm_str):
+	asm_str = re.sub(r'\b[RE]?[IS]P\b', 'REGPOINT', asm_str)
+	asm_str = re.sub(r'\b[DA][HL]\b', 'REGDATA8', asm_str)
+	asm_str = re.sub(r'\bRCX|R[0-9][0-5]?\b', 'REGGEN64', asm_str)
+	asm_str = re.sub(r'\bECX|R[0-9][0-5]D?\b', 'REGGEN32', asm_str)
+	asm_str = re.sub(r'\bCX|R[0-9][0-5]?W\b', 'REGGEN16', asm_str)
+	asm_str = re.sub(r'\b[SD]IL|B[HP]L\b', 'REGADDR8', asm_str)
+	asm_str = re.sub(r'\bC[HL]|R[0-9][0-5]?B\b', 'REGGEN8', asm_str)
+	asm_str = re.sub(r'\b[DA]X\b', 'REGDATA16', asm_str)
+	asm_str = re.sub(r'\bR[SD]I\b|\bRB[PX]\b', 'REGADDR64', asm_str)
+	asm_str = re.sub(r'\bE[SD]I\b|\bEB[PX]\b', 'REGADDR32', asm_str)
+	asm_str = re.sub(r'\b[SD]I\b|\bB[PX]\b', 'REGADDR16', asm_str)
+	asm_str = re.sub(r'\bE[DA]X\b', 'REGDATA32', asm_str)
+	asm_str = re.sub(r'\bR[DA]X\b', 'REGDATA64', asm_str)
+	asm_str = re.sub(r'\bST[0-7]\b|\bXMM[0-9][0-5]?\b|\bFP[CS]R\b|\bFPTAG\b|\bFP[ID]\b \
+						|\bMXCSR\b|\bMXCSR_MASK\b|\bXMM[0-7]_[LH]\b|\bXMM[189][0-5]?_[LH]\b', 'REGFLOAT', asm_str)
+	return asm_str
 
-def preprocess_string(s, operators):
-	start = 'X_'
+def convert_string(s, operators, operands, not_to_sub, segments):
 	delim = '_'
 	out_string = ''
 	string_split = s.split() # splits on space char
 	l = len(string_split)
 	for ix in range(l):
 		curr_word = string_split[ix]
+		next_word = None
 		if ix < l-1:
 			next_word = string_split[ix+1]
-		else:
-			next_word = None
 		if curr_word in operators:
-			out_string += start+curr_word+delim
-		elif curr_word == 'RET':
-			if next_word is None:
-				out_string += start+curr_word
-			else:
-				out_string += start+curr_word+' '
+			if next_word != None:
+				if next_word in operators:
+					out_string += curr_word+' '
+				elif next_word in operands or next_word in not_to_sub or next_word in segments or next_word.startswith('[') or next_word.startswith('0x') or next_word[-1] == ']':
+					out_string += curr_word+delim
+				else:
+					out_string += curr_word+' ' #it's a string
 		else:
-			if next_word in operators or next_word == 'RET':
-				out_string += curr_word+' '
-			elif next_word != None:
-				out_string += curr_word+delim
+			if next_word != None:
+				if next_word in operators:
+					out_string += curr_word+' '
+				elif next_word in operands or next_word in not_to_sub or next_word in segments or next_word.startswith('[') or next_word.startswith('0x') or next_word[-1] == ']':
+					out_string += curr_word+delim
+				else:
+					out_string += curr_word+' ' #it's a string
 			else:
-				out_string += curr_word
+				out_string += curr_word # last word
 	return out_string
 
 def main():
 	cwd = os.getcwd()
 	file_path = cwd+'\\load_file.json'
 	save_file = cwd+'\\pre_load_file.json'
-	operators = ['MOV', 'CALL', 'JNZ', 'JZ', 'JMP', 'XOR', 'MOVSXD', 'MOVSX', 'JG', 'ADD', 'LEA', 'PUSH', 'POP', 'SUB', 'TEST']
+	operators_file = cwd+'\\op_x86.txt'
+	operators = []
+	operands = ['REGPOINT', 'REGFLOAT', 'REGGEN64', 'REGGEN32', 'REGGEN16', 'REGGEN8',
+				'REGDATA64', 'REGDATA32', 'REGDATA16', 'REGDATA', 'REGADDR64', 'REGADDR32','REGADDR16', 'REGADDR8']
+	not_to_sub = ['qword', 'dword', 'ptr', 'IMM', 'MEM', 'BB', 'FUN']
+	segments = ['FS', 'ES', 'GS', 'CS', 'DS', 'SS']
+	with open(operators_file, 'r') as f:
+		while True:
+			op = f.readline()
+			if op:
+				operators.append(op.strip())
+			else:
+				break
 	with open(file_path, 'r') as f:
 		to_preprocess = json.load(f)
 	preprocessed = []
 	for seq in to_preprocess:
-		seq_preprocessed = preprocess_string(seq, operators)
+		seq_filtered = filter_registers(seq)
+		seq_preprocessed = convert_string(seq_filtered, operators, operands, not_to_sub, segments)
 		preprocessed.append(seq_preprocessed)
 	with open(save_file, 'w') as f:
 		json.dump(preprocessed, f)
@@ -49,19 +82,3 @@ def main():
 
 if __name__ == '__main__':
 	main()
-
-
-####### Output for one string:
-##
-##
-#Original string:
-#
-#MOV qword ptr [RSP] IMM MOV qword ptr [RSP 0x10] IMM MOV RDI RBX JNZ IMM XOR EAX EAX MOV RDI R13        
-#LEA R13 [RSP 0x20] MOV R12 RAX CALL sigemptyset CALL FUN PUSH R13 PUSH R12 PUSH RBP PUSH RBX MOV RBX RDI MOV RBP RAX SUB RSP 0xb8
-#TEST EAX EAX CALL FUN MOV RSI RAX CALL FUN MOV EAX dword ptr [R12 0xd8] MOV RDI RBX MOV RAX qword ptr FS [0x28]
-#
-#String preprocessed:
-#
-#X_MOV_qword_ptr_[RSP]_IMM X_MOV_qword_ptr_[RSP_0x10]_IMM X_MOV_RDI_RBX X_JNZ_IMM_XOR_EAX_EAX X_MOV_RDI_R13 X_LEA_R13_[RSP_0x20] 
-#X_MOV_R12_RAX X_CALL_sigemptyset X_CALL_FUN X_PUSH_R13 X_PUSH_R12 X_PUSH_RBP X_PUSH_RBX X_MOV_RBX_RDI X_MOV_RBP_RAX X_SUB_RSP_0xb8 
-#X_TEST_EAX_EAX X_CALL_FUN X_MOV_RSI_RAX X_CALL_FUN X_MOV_EAX_dword_ptr_[R12_0xd8] X_MOV_RDI_RBX X_MOV_RAX_qword_ptr_FS_[0x28]

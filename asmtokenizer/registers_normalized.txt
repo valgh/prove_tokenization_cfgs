@@ -1,0 +1,31 @@
+REGPOINT
+REGFLOAT
+REGGEN64
+REGGEN32
+REGGEN16
+REGGEN8
+REGDATA64
+REGDATA32
+REGDATA16
+REGDATA
+REGADDR64
+REGADDR32
+REGADDR16
+REGADDR8
+
+
+==============REGISTER CATEGORIES===================
+
+8/16/32/64 = bits
+
+categorie: POINTER REGISTRIES, FLOAT REGISTRIES, GENERAL REGISTRIES, DATA REGISTRIES, ADDRESS REGISTRIES
+
+1. REGPOINT -> 		xIP, xSP (Instruction Pointer, Stack Pointer)
+2. REGFLOAT -> 		ST(0-7), XMM(1-15), others? FPCR FPSR etc.? They are in INTELx86
+3. REGGEN(8,16,32,64) -> 		xCX, R(8-15) (Counter, R8-15)
+4. REGDATA(8,16,32,64) -> 		xAX, xDX (Accumulator, Data)
+5. REGADDR(8,16,32,64) -> 		xSI, xDI, xBP, xBX (Source Index, Destination Index, Base Pointer, Base Register)
+
+(per gli 8 bits ovviamente prendo anche i rispettivi registri - es. AH/AL per xAX)
+
+=14

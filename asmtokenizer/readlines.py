@@ -4,8 +4,8 @@ import os
 
 def main():
 	cwd = os.getcwd()
-	json_file = cwd+'\\pre_load_file.json'
-	tok_train = cwd+'\\input.txt'
+	json_file = cwd+'\\load_file.json'
+	tok_train = cwd+'\\input_not_normalized.txt'
 	with open(json_file, 'r') as f:
 		sequences = json.load(f)
 	with open(tok_train, 'w') as f:
