@@ -3,7 +3,6 @@
 #####################
 
 import os
-<<<<<<< HEAD
 import tqdm
 import multiprocessing as mp
 from multiprocessing import Manager
