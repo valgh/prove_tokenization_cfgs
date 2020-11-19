@@ -27,6 +27,7 @@ ops.append('JS')
 ops.append('JCXZ')
 ops.append('JECXZ')
 ops.append('JRCXZ')
+# + some others were added manually because they were missing (CMOVcc, etc.)
 with open(out, 'w') as f:
 	for op in ops:
 		f.write(op)
