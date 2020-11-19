@@ -7,8 +7,6 @@ import os
 import tqdm
 import multiprocessing as mp
 from multiprocessing import Manager
-=======
->>>>>>> b83e51f3baf45c302c9cf6d7d2c680186300f713
 
 
 # with multiprocessing, this might be efficient, 
